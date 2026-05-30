@@ -38,3 +38,48 @@ func (r *Repository) CreateTree(
 
 	return id, nil
 }
+
+func (r *Repository) GetEstateTrees(
+	ctx context.Context,
+	estateID string,
+) ([]Tree, error) {
+
+	query := `
+		SELECT x, y, height
+		FROM trees
+		WHERE estate_id = $1
+	`
+
+	rows, err := r.DB.QueryContext(
+		ctx,
+		query,
+		estateID,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var trees []Tree
+
+	for rows.Next() {
+
+		var tree Tree
+
+		err := rows.Scan(
+			&tree.X,
+			&tree.Y,
+			&tree.Height,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		trees = append(trees, tree)
+	}
+
+	return trees, nil
+}
