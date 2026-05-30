@@ -9,12 +9,9 @@ import (
 	"github.com/oapi-codegen/runtime/types"
 )
 
-func (s *Server) PostEstateIdTree(
-	ctx echo.Context,
-	id types.UUID,
-) error {
+func (s *Server) PostEstate(ctx echo.Context) error {
 
-	var req generated.CreateTreeRequest
+	var req generated.CreateEstateRequest
 
 	if err := ctx.Bind(&req); err != nil {
 		return ctx.JSON(
@@ -25,54 +22,28 @@ func (s *Server) PostEstateIdTree(
 		)
 	}
 
-	if req.Height < 1 || req.Height > 30 {
+	if req.Width < 1 || req.Width > 50000 {
 		return ctx.JSON(
 			http.StatusBadRequest,
 			generated.ErrorResponse{
-				Message: StringPtr("invalid height"),
+				Message: StringPtr("invalid width"),
 			},
 		)
 	}
 
-	// TARUH DI SINI
-	exists, width, length, err := s.Repository.GetEstateByID(
+	if req.Length < 1 || req.Length > 50000 {
+		return ctx.JSON(
+			http.StatusBadRequest,
+			generated.ErrorResponse{
+				Message: StringPtr("invalid length"),
+			},
+		)
+	}
+
+	id, err := s.Repository.CreateEstate(
 		ctx.Request().Context(),
-		id.String(),
-	)
-
-	if err != nil || !exists {
-		return ctx.JSON(
-			http.StatusNotFound,
-			generated.ErrorResponse{
-				Message: StringPtr("estate not found"),
-			},
-		)
-	}
-
-	if req.X < 1 || req.X > length {
-		return ctx.JSON(
-			http.StatusBadRequest,
-			generated.ErrorResponse{
-				Message: StringPtr("invalid x"),
-			},
-		)
-	}
-
-	if req.Y < 1 || req.Y > width {
-		return ctx.JSON(
-			http.StatusBadRequest,
-			generated.ErrorResponse{
-				Message: StringPtr("invalid y"),
-			},
-		)
-	}
-
-	treeID, err := s.Repository.CreateTree(
-		ctx.Request().Context(),
-		id.String(),
-		req.X,
-		req.Y,
-		req.Height,
+		req.Width,
+		req.Length,
 	)
 
 	if err != nil {
@@ -84,13 +55,13 @@ func (s *Server) PostEstateIdTree(
 		)
 	}
 
-	parsedUUID, err := uuid.Parse(treeID)
+	parsedUUID, err := uuid.Parse(id)
 
 	if err != nil {
 		return ctx.JSON(
 			http.StatusInternalServerError,
 			generated.ErrorResponse{
-				Message: StringPtr("failed parse uuid"),
+				Message: StringPtr("failed to parse uuid"),
 			},
 		)
 	}
@@ -98,9 +69,36 @@ func (s *Server) PostEstateIdTree(
 	responseUUID := types.UUID(parsedUUID)
 
 	return ctx.JSON(
-		http.StatusOK,
-		generated.TreeResponse{
+		http.StatusCreated,
+		generated.EstateResponse{
 			Id: &responseUUID,
 		},
 	)
+}
+
+func (r *Repository) GetEstateByID(
+	ctx context.Context,
+	id string,
+) (bool, int, int, error) {
+
+	var width int
+	var length int
+
+	query := `
+		SELECT width, length
+		FROM estates
+		WHERE id = $1
+	`
+
+	err := r.DB.QueryRowContext(
+		ctx,
+		query,
+		id,
+	).Scan(&width, &length)
+
+	if err != nil {
+		return false, 0, 0, err
+	}
+
+	return true, width, length, nil
 }

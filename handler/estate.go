@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/SawitProRecruitment/UserService/generated"
@@ -70,36 +69,9 @@ func (s *Server) PostEstate(ctx echo.Context) error {
 	responseUUID := types.UUID(parsedUUID)
 
 	return ctx.JSON(
-		http.StatusCreated,
+		http.StatusOK,
 		generated.EstateResponse{
 			Id: &responseUUID,
 		},
 	)
-}
-
-func (r *Repository) GetEstateByID(
-	ctx context.Context,
-	id string,
-) (bool, int, int, error) {
-
-	var width int
-	var length int
-
-	query := `
-		SELECT width, length
-		FROM estates
-		WHERE id = $1
-	`
-
-	err := r.DB.QueryRowContext(
-		ctx,
-		query,
-		id,
-	).Scan(&width, &length)
-
-	if err != nil {
-		return false, 0, 0, err
-	}
-
-	return true, width, length, nil
 }

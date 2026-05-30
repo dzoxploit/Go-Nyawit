@@ -5,21 +5,19 @@ info:
   version: 1.0.0
 
 servers:
-  - url: http://localhost:8080
+  - url: http://localhost:8081
 
 paths:
   /estate:
     post:
       operationId: PostEstate
       summary: Create estate
-
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateEstateRequest'
-
       responses:
         '201':
           description: Estate created
@@ -27,18 +25,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EstateResponse'
-
         '400':
           description: Bad request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-   /estate/{id}/tree:
+
+  /estate/{id}/tree:
     post:
       operationId: PostEstateIdTree
       summary: Add tree into estate
-
       parameters:
         - name: id
           in: path
@@ -61,20 +58,56 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TreeResponse'
-
         '400':
           description: Bad request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
         '404':
           description: Estate not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /estate/{id}/stats:
+    get:
+      operationId: GetEstateIdStats
+      summary: Get estate statistics
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsResponse'
+
+  /estate/{id}/drone-plan:
+    get:
+      operationId: GetEstateIdDronePlan
+      summary: Get drone flight plan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Drone Plan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DronePlanResponse'        
 
 components:
   schemas:
@@ -84,13 +117,11 @@ components:
       required:
         - width
         - length
-
       properties:
         width:
           type: integer
           minimum: 1
           maximum: 50000
-
         length:
           type: integer
           minimum: 1
@@ -98,35 +129,22 @@ components:
 
     EstateResponse:
       type: object
-
       properties:
         id:
           type: string
           format: uuid
 
-    ErrorResponse:
-      type: object
-
-      properties:
-        message:
-          type: string
-
-          
     CreateTreeRequest:
       type: object
-
       required:
         - x
         - y
         - height
-
       properties:
         x:
           type: integer
-
         y:
           type: integer
-
         height:
           type: integer
           minimum: 1
@@ -134,9 +152,31 @@ components:
 
     TreeResponse:
       type: object
-
       properties:
         id:
           type: string
           format: uuid
-    
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+    StatsResponse:
+      type: object
+      properties:
+        count:
+          type: integer
+        max:
+          type: integer
+        min:
+          type: integer
+        median:
+          type: integer
+
+    DronePlanResponse:
+      type: object
+      properties:
+        distance:
+          type: integer

@@ -4,6 +4,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 )
 
 func (r *Repository) CreateEstate(
@@ -55,6 +56,10 @@ func (r *Repository) GetEstateByID(
 	).Scan(&width, &length)
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, 0, 0, nil
+		}
+
 		return false, 0, 0, err
 	}
 

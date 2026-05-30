@@ -48,3 +48,50 @@ func (mr *MockRepositoryInterfaceMockRecorder) CreateEstate(ctx, width, length i
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateEstate", reflect.TypeOf((*MockRepositoryInterface)(nil).CreateEstate), ctx, width, length)
 }
+
+// CreateTree mocks base method.
+func (m *MockRepositoryInterface) CreateTree(ctx context.Context, estateID string, x, y, height int) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateTree", ctx, estateID, x, y, height)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateTree indicates an expected call of CreateTree.
+func (mr *MockRepositoryInterfaceMockRecorder) CreateTree(ctx, estateID, x, y, height interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTree", reflect.TypeOf((*MockRepositoryInterface)(nil).CreateTree), ctx, estateID, x, y, height)
+}
+
+// GetEstateByID mocks base method.
+func (m *MockRepositoryInterface) GetEstateByID(ctx context.Context, id string) (bool, int, int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetEstateByID", ctx, id)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(int)
+	ret2, _ := ret[2].(int)
+	ret3, _ := ret[3].(error)
+	return ret0, ret1, ret2, ret3
+}
+
+// GetEstateByID indicates an expected call of GetEstateByID.
+func (mr *MockRepositoryInterfaceMockRecorder) GetEstateByID(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEstateByID", reflect.TypeOf((*MockRepositoryInterface)(nil).GetEstateByID), ctx, id)
+}
+
+// GetTreeHeights mocks base method.
+func (m *MockRepositoryInterface) GetTreeHeights(ctx context.Context, estateID string) ([]int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTreeHeights", ctx, estateID)
+	ret0, _ := ret[0].([]int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTreeHeights indicates an expected call of GetTreeHeights.
+func (mr *MockRepositoryInterfaceMockRecorder) GetTreeHeights(ctx, estateID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTreeHeights", reflect.TypeOf((*MockRepositoryInterface)(nil).GetTreeHeights), ctx, estateID)
+}

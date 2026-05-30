@@ -1,10 +1,12 @@
-// This file contains the interfaces for the repository layer.
-// The repository layer is responsible for interacting with the database.
-// For testing purpose we will generate mock implementations of these
-// interfaces using mockgen. See the Makefile for more information.
 package repository
 
 import "context"
+
+type Tree struct {
+	X      int
+	Y      int
+	Height int
+}
 
 type RepositoryInterface interface {
 	CreateEstate(
@@ -12,8 +14,27 @@ type RepositoryInterface interface {
 		width int,
 		length int,
 	) (string, error)
+
 	GetEstateByID(
 		ctx context.Context,
 		id string,
 	) (bool, int, int, error)
+
+	CreateTree(
+		ctx context.Context,
+		estateID string,
+		x int,
+		y int,
+		height int,
+	) (string, error)
+
+	GetTreeHeights(
+		ctx context.Context,
+		estateID string,
+	) ([]int, error)
+
+	GetEstateTrees(
+		ctx context.Context,
+		estateID string,
+	) ([]Tree, error)
 }

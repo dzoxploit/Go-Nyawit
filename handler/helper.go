@@ -1,5 +1,9 @@
 package handler
 
-func StringPtr(s string) *string {
-	return &s
+func StringPtr(v string) *string {
+	return &v
+}
+
+func IntPtr(v int) *int {
+	return &v
 }
