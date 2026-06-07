@@ -36,5 +36,9 @@ func (r *Repository) GetTreeHeights(
 		heights = append(heights, h)
 	}
 
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return heights, nil
 }

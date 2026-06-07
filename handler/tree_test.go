@@ -8,31 +8,40 @@ import (
 
 	"github.com/SawitProRecruitment/UserService/repository"
 	"github.com/golang/mock/gomock"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
-func TestPostEstate(t *testing.T) {
+func TestPostEstateIdTreeDuplicateCoordinate(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	mockRepo := repository.NewMockRepositoryInterface(ctrl)
 
+	estateID := uuid.New()
+
 	mockRepo.
 		EXPECT().
-		CreateEstate(gomock.Any(), 5, 10).
-		Return("5fc3572c-2847-48b0-80e6-66cdc91d5a7f", nil)
+		GetEstateByID(gomock.Any(), estateID.String()).
+		Return(true, 10, 10, nil)
+
+	mockRepo.
+		EXPECT().
+		CreateTree(gomock.Any(), estateID.String(), 2, 3, 5).
+		Return("", repository.ErrTreeAlreadyExists)
 
 	server := &Server{
 		Repository: mockRepo,
 	}
 
-	body := []byte(`{"width":5,"length":10}`)
+	body := []byte(`{"x":2,"y":3,"height":5}`)
 
 	e := echo.New()
 
 	req := httptest.NewRequest(
 		http.MethodPost,
-		"/estate",
+		"/estate/"+estateID.String()+"/tree",
 		bytes.NewReader(body),
 	)
 
@@ -42,16 +51,16 @@ func TestPostEstate(t *testing.T) {
 
 	ctx := e.NewContext(req, rec)
 
-	err := server.PostEstate(ctx)
+	err := server.PostEstateIdTree(ctx, openapi_types.UUID(estateID))
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if rec.Code != http.StatusOK {
+	if rec.Code != http.StatusBadRequest {
 		t.Fatalf(
 			"expected %d got %d",
-			http.StatusOK,
+			http.StatusBadRequest,
 			rec.Code,
 		)
 	}

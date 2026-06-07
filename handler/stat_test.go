@@ -20,6 +20,11 @@ func TestGetEstateStats(t *testing.T) {
 
 	mockRepo.
 		EXPECT().
+		GetEstateByID(gomock.Any(), gomock.Any()).
+		Return(true, 10, 20, nil)
+
+	mockRepo.
+		EXPECT().
 		GetTreeHeights(gomock.Any(), gomock.Any()).
 		Return([]int{5, 10, 15}, nil)
 

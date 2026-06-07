@@ -12,6 +12,28 @@ func (s *Server) GetEstateIdStats(
 	ctx echo.Context,
 	id types.UUID,
 ) error {
+	exists, _, _, err := s.Repository.GetEstateByID(
+		ctx.Request().Context(),
+		id.String(),
+	)
+
+	if err != nil {
+		return ctx.JSON(
+			http.StatusInternalServerError,
+			generated.ErrorResponse{
+				Message: StringPtr(err.Error()),
+			},
+		)
+	}
+
+	if !exists {
+		return ctx.JSON(
+			http.StatusNotFound,
+			generated.ErrorResponse{
+				Message: StringPtr("estate not found"),
+			},
+		)
+	}
 
 	heights, err := s.Repository.GetTreeHeights(
 		ctx.Request().Context(),

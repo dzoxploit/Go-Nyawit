@@ -2,12 +2,11 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/SawitProRecruitment/UserService/generated"
 	"github.com/SawitProRecruitment/UserService/handler"
 	"github.com/SawitProRecruitment/UserService/repository"
-
-	"os"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -35,8 +34,13 @@ func main() {
 	})
 
 	e.Use(middleware.Logger())
-	e.Use(middleware.Logger())
-	e.Logger.Fatal(e.Start(":1323"))
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8081"
+	}
+
+	e.Logger.Fatal(e.Start(":" + port))
 }
 
 func newServer() *handler.Server {

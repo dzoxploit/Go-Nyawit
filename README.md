@@ -51,13 +51,13 @@ You should be able to run using the script `run.sh`:
 
 You may see some errors since you have not created the API yet.
 
-However for testing, you can use Docker run the project, run the following command:
+However for testing, you can use Docker to run the project:
 
 ```
-docke -compose up --build
+docker compose up --build
 ```
 
-You should be able to access the API at http://localhost:8080
+You should be able to access the API at http://localhost:8081
 
 If you change `database.sql` file, you need to reinitate the database by running:
 

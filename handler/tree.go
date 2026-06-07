@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/SawitProRecruitment/UserService/generated"
+	"github.com/SawitProRecruitment/UserService/repository"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/oapi-codegen/runtime/types"
@@ -34,13 +36,21 @@ func (s *Server) PostEstateIdTree(
 		)
 	}
 
-	// TARUH DI SINI
 	exists, width, length, err := s.Repository.GetEstateByID(
 		ctx.Request().Context(),
 		id.String(),
 	)
 
-	if err != nil || !exists {
+	if err != nil {
+		return ctx.JSON(
+			http.StatusInternalServerError,
+			generated.ErrorResponse{
+				Message: StringPtr(err.Error()),
+			},
+		)
+	}
+
+	if !exists {
 		return ctx.JSON(
 			http.StatusNotFound,
 			generated.ErrorResponse{
@@ -76,6 +86,15 @@ func (s *Server) PostEstateIdTree(
 	)
 
 	if err != nil {
+		if errors.Is(err, repository.ErrTreeAlreadyExists) {
+			return ctx.JSON(
+				http.StatusBadRequest,
+				generated.ErrorResponse{
+					Message: StringPtr(err.Error()),
+				},
+			)
+		}
+
 		return ctx.JSON(
 			http.StatusInternalServerError,
 			generated.ErrorResponse{

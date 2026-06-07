@@ -1,6 +1,13 @@
 package repository
 
-import "context"
+import (
+	"context"
+	"errors"
+
+	"github.com/lib/pq"
+)
+
+var ErrTreeAlreadyExists = errors.New("tree already exists at coordinates")
 
 func (r *Repository) CreateTree(
 	ctx context.Context,
@@ -33,6 +40,11 @@ func (r *Repository) CreateTree(
 	).Scan(&id)
 
 	if err != nil {
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) && pqErr.Code == "23505" {
+			return "", ErrTreeAlreadyExists
+		}
+
 		return "", err
 	}
 
@@ -79,6 +91,10 @@ func (r *Repository) GetEstateTrees(
 		}
 
 		trees = append(trees, tree)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return trees, nil

@@ -13,12 +13,21 @@ func (s *Server) GetEstateIdDronePlan(
 	id types.UUID,
 ) error {
 
-	_, width, length, err := s.Repository.GetEstateByID(
+	exists, width, length, err := s.Repository.GetEstateByID(
 		ctx.Request().Context(),
 		id.String(),
 	)
 
 	if err != nil {
+		return ctx.JSON(
+			http.StatusInternalServerError,
+			generated.ErrorResponse{
+				Message: StringPtr(err.Error()),
+			},
+		)
+	}
+
+	if !exists {
 		return ctx.JSON(
 			http.StatusNotFound,
 			generated.ErrorResponse{
